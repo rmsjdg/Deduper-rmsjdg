@@ -1,0 +1,44 @@
+Problem: 
+    Our data contains PCR duplicates which may impact any count-based analyses we want to do. 
+    Need to identify duplicate reads and keep only one. 
+
+use SAMtools sort to order the file by alignment 
+
+argparse
+probably regex for extracting headers and/or cigar string
+
+Functions to define:
+- find_chr:
+    ''' When given a line from a sam file, returns the chromosome.'''
+    split and strip then pull column 3.
+    return chromosome: int
+- find_pos:
+    ''' When given a line from a sam file, takes the position, corrects for soft clipping, and returns the "true" position. '''
+    return int
+    Extract position (taking into account CIGAR string for soft clipping) (col4 and cigar (col 6))
+- find_strand:
+    if ((flag & 16) == 16):
+	    rev_comp = True
+        return rev_comp
+- find_umi:
+    return umi: int (from header)
+    if no umi, return 0
+
+open umi file and create a set of the umis 
+
+open the sam file and out file
+
+bypass initial @ header lines 
+
+for each read, run functions for pulling out chr, position, stran, and umi. 
+    if find_umi returns 0, move on to next read
+
+Since SAMtools sorted by chr then position, we can work our way down the chromosome and clear our dict at the end of each chromosome to save memory. 
+
+Store value to counmt what chromosome we're on
+Store in dictionary with umi as key and chr, pos, strand as a list value.
+
+If the line we're on is not in our dictionary as an extablished value, write to the out file.
+If the line we're on IS in our dictionary, continue 
+
+When we reach a new chromosome, clear the dict to save memory and increase the chromosome counter.
